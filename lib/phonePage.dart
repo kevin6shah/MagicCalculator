@@ -1,7 +1,7 @@
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:magicCalculator/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PhonePage extends StatefulWidget {
   Contact contact;
@@ -57,15 +57,63 @@ class _PhonePageState extends State<PhonePage> {
                       ),
                       Expanded(
                         flex: 0,
-                        child: indicator(phones[index].value),
+                        child: FutureBuilder(
+                          future: SharedPreferences.getInstance(),
+                          builder: (context,
+                              AsyncSnapshot<SharedPreferences> snapshot) {
+                            if (snapshot.hasData) {
+                              snapshot.data.reload();
+                              List<String> phoneNumbers =
+                                  snapshot.data.getStringList('phoneNumbers');
+                              return (phoneNumbers != null)
+                                  ? Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          child: Container(
+                                            color: phoneNumbers.contains(
+                                                    phones[index].value)
+                                                ? Colors.white
+                                                : Colors.black,
+                                            height: 20,
+                                            width: 20,
+                                          ),
+                                        ),
+                                        Text(
+                                          (phoneNumbers.indexOf(
+                                                      phones[index].value) +
+                                                  1)
+                                              .toString(),
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Container();
+                            } else
+                              return Container();
+                          },
+                        ),
                       ),
                     ],
                   ),
                 ),
-                onPressed: () {
-                  setState(() {
+                onPressed: () async {
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  if (!prefs.containsKey('phoneNumbers'))
+                    prefs.setStringList('phoneNumbers', []);
+                  List<String> phoneNumbers =
+                      prefs.getStringList('phoneNumbers');
+                  if (!phoneNumbers.contains(phones[index].value))
                     phoneNumbers.add(phones[index].value);
-                  });
+                  prefs.setStringList('phoneNumbers', phoneNumbers);
+                  setState(() {});
                 },
               ),
               Divider(
@@ -80,28 +128,4 @@ class _PhonePageState extends State<PhonePage> {
       ),
     );
   }
-}
-
-Widget indicator(String phone) {
-  return Stack(
-    alignment: Alignment.center,
-    children: [
-      ClipRRect(
-        borderRadius: BorderRadius.circular(50),
-        child: Container(
-          color: (phoneNumbers.contains(phone)) ? Colors.white : Colors.black,
-          height: 20,
-          width: 20,
-        ),
-      ),
-      Text(
-        (phoneNumbers.indexOf(phone) + 1).toString(),
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    ],
-  );
 }

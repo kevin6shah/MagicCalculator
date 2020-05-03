@@ -4,9 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:hardware_buttons/hardware_buttons.dart' as HardwareButtons;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'contactsPage.dart';
-
-List<String> phoneNumbers = [];
 
 void main() {
   runApp(MyApp());
@@ -23,6 +22,7 @@ class _MyAppState extends State<MyApp> {
   double prev;
   int numPressed = 0;
   String phoneNumber;
+  List<String> phoneNumbers = [];
 
   String operatorSelected;
   String operatorConfirmed;
@@ -36,6 +36,14 @@ class _MyAppState extends State<MyApp> {
         numPressed += 1;
       });
     });
+
+    _getNumbersList();
+  }
+
+  Future<void> _getNumbersList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.containsKey('phoneNumbers'))
+      phoneNumbers = prefs.getStringList('phoneNumbers');
   }
 
   @override
@@ -247,6 +255,16 @@ class _MyAppState extends State<MyApp> {
                             text: clearStatus,
                             buttonType: 'action',
                             onTapped: onTapped,
+                            onUpdate: () async {
+                              SharedPreferences pref =
+                                  await SharedPreferences.getInstance();
+                              phoneNumbers = [];
+                              if (pref != null &&
+                                  pref.containsKey('phoneNumbers'))
+                                phoneNumbers =
+                                    pref.getStringList('phoneNumbers');
+                              setState(() {});
+                            },
                           ),
                           Button(
                             text: '+/-',
@@ -372,6 +390,7 @@ class Button extends StatelessWidget {
   String buttonType;
   bool activate;
   void Function(String) onTapped;
+  void Function() onUpdate;
 
   Map<String, CupertinoDynamicColor> colors = {
     'action': CupertinoColors.systemGrey2,
@@ -385,6 +404,7 @@ class Button extends StatelessWidget {
     @required this.onTapped,
     this.buttonType,
     this.activate,
+    this.onUpdate,
   });
 
   @override
@@ -400,8 +420,11 @@ class Button extends StatelessWidget {
           if (text == 'AC' || text == 'C') {
             Iterable<Contact> contacts = await ContactsService.getContacts();
             List<Contact> list = contacts.toList();
-            Navigator.push(context,
-                CupertinoPageRoute(builder: (context) => ContactsPage(list)));
+            Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                        builder: (context) => ContactsPage(list)))
+                .then((value) => onUpdate());
           } else if (text == '0') {
             Navigator.push(context, CupertinoPageRoute(builder: (context) {
               return CupertinoPageScaffold(
