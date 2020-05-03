@@ -2,12 +2,41 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:magicCalculator/main.dart';
-
 import 'phonePage.dart';
 
-class ContactsPage extends StatelessWidget {
+class ContactsPage extends StatefulWidget {
   List<Contact> contacts;
   ContactsPage(this.contacts);
+
+  @override
+  _ContactsPageState createState() => _ContactsPageState();
+}
+
+class _ContactsPageState extends State<ContactsPage> {
+  List<Widget> indicators(Contact c) {
+    List<Widget> indicatorThings = [];
+    List<Widget> temp = [
+      Text(
+        c.displayName,
+        style: TextStyle(
+          color: CupertinoColors.white,
+        ),
+      ),
+    ];
+    List<Item> phones = c.phones.toList();
+    for (int i = 0; i < phones.length; i++) {
+      if (phoneNumbers.contains(phones[i].value)) {
+        indicatorThings.add(indicator(phones[i].value));
+        indicatorThings.add(SizedBox(
+          width: 5,
+        ));
+      }
+    }
+    temp.add(Row(
+      children: indicatorThings,
+    ));
+    return temp;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +51,9 @@ class ContactsPage extends StatelessWidget {
             ),
           ),
           onTap: () {
-            phoneNumber = null;
-            Navigator.pop(context);
+            setState(() {
+              phoneNumbers.clear();
+            });
           },
         ),
         backgroundColor: CupertinoColors.darkBackgroundGray,
@@ -36,26 +66,23 @@ class ContactsPage extends StatelessWidget {
         ),
       ),
       child: ListView.builder(
-        itemCount: contacts.length,
+        itemCount: widget.contacts.length,
         itemBuilder: (context, index) {
           return Column(
             children: [
               CupertinoButton(
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: Text(
-                    contacts[index].displayName,
-                    style: TextStyle(
-                      color: CupertinoColors.white,
-                    ),
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: indicators(widget.contacts[index]),
                 ),
                 onPressed: () => Navigator.push(
                   context,
                   CupertinoPageRoute(
-                    builder: (context) => PhonePage(contacts[index]),
+                    builder: (context) => PhonePage(widget.contacts[index]),
                   ),
-                ),
+                ).then((value) {
+                  setState(() {});
+                }),
               ),
               Divider(
                 color: CupertinoColors.inactiveGray,

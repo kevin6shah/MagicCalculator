@@ -6,7 +6,7 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:hardware_buttons/hardware_buttons.dart' as HardwareButtons;
 import 'contactsPage.dart';
 
-String phoneNumber;
+List<String> phoneNumbers = [];
 
 void main() {
   runApp(MyApp());
@@ -22,6 +22,7 @@ class _MyAppState extends State<MyApp> {
   String clearStatus = 'AC';
   double prev;
   int numPressed = 0;
+  String phoneNumber;
 
   String operatorSelected;
   String operatorConfirmed;
@@ -184,6 +185,17 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    if (phoneNumbers.length != 0 &&
+        numPressed <= phoneNumbers.length &&
+        numPressed > 0) {
+      phoneNumber = phoneNumbers[numPressed - 1];
+    }
+
+    if (numPressed > phoneNumbers.length) {
+      phoneNumber = null;
+      numPressed = 0;
+    }
+
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,

@@ -3,14 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:magicCalculator/main.dart';
 
-class PhonePage extends StatelessWidget {
+class PhonePage extends StatefulWidget {
   Contact contact;
   PhonePage(this.contact);
+
+  @override
+  _PhonePageState createState() => _PhonePageState();
+}
+
+class _PhonePageState extends State<PhonePage> {
   List<Item> phones;
 
   @override
   Widget build(BuildContext context) {
-    phones = contact.phones.toList();
+    phones = widget.contact.phones.toList();
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -49,13 +55,17 @@ class PhonePage extends StatelessWidget {
                           phones[index].value,
                         ),
                       ),
+                      Expanded(
+                        flex: 0,
+                        child: indicator(phones[index].value),
+                      ),
                     ],
                   ),
                 ),
                 onPressed: () {
-                  phoneNumber = phones[index].value;
-                  Navigator.pop(context);
-                  Navigator.pop(context);
+                  setState(() {
+                    phoneNumbers.add(phones[index].value);
+                  });
                 },
               ),
               Divider(
@@ -70,4 +80,28 @@ class PhonePage extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget indicator(String phone) {
+  return Stack(
+    alignment: Alignment.center,
+    children: [
+      ClipRRect(
+        borderRadius: BorderRadius.circular(50),
+        child: Container(
+          color: (phoneNumbers.contains(phone)) ? Colors.white : Colors.black,
+          height: 20,
+          width: 20,
+        ),
+      ),
+      Text(
+        (phoneNumbers.indexOf(phone) + 1).toString(),
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ],
+  );
 }
