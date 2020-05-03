@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:hardware_buttons/hardware_buttons.dart' as HardwareButtons;
 import 'contactsPage.dart';
 
 String phoneNumber;
@@ -19,9 +21,27 @@ class _MyAppState extends State<MyApp> {
   String output = '0';
   String clearStatus = 'AC';
   double prev;
+  int numPressed = 0;
 
   String operatorSelected;
   String operatorConfirmed;
+  StreamSubscription<HardwareButtons.HomeButtonEvent> _homeButtonSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _homeButtonSubscription = HardwareButtons.homeButtonEvents.listen((event) {
+      setState(() {
+        numPressed += 1;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _homeButtonSubscription?.cancel();
+  }
 
   void init() {
     output = '0';

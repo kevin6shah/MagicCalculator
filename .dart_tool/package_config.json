@@ -92,6 +92,12 @@
       "languageVersion": "2.2"
     },
     {
+      "name": "hardware_buttons",
+      "rootUri": "file:///Users/kevinshah/Documents/Flutter/flutter/.pub-cache/hosted/pub.dartlang.org/hardware_buttons-1.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.1"
+    },
+    {
       "name": "image",
       "rootUri": "file:///Users/kevinshah/Documents/Flutter/flutter/.pub-cache/hosted/pub.dartlang.org/image-2.1.12",
       "packageUri": "lib/",
@@ -200,7 +206,7 @@
       "languageVersion": "2.7"
     }
   ],
-  "generated": "2020-05-02T01:39:05.285524Z",
+  "generated": "2020-05-03T06:50:55.693672Z",
   "generator": "pub",
   "generatorVersion": "2.9.0-3.0.dev.flutter-a69cb6d700"
 }
